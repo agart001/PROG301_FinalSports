@@ -11,8 +11,6 @@ namespace SportsLibrary.Interfaces.IPersons
     internal interface IPlayer : IWorker
     {
         public IOrganization Team { get; protected set; }
-
-        public Enum Stat { get; protected set; }
-        public Hashtable Stats { get; protected set; }
+        public Dictionary<string, object> Stats { get; protected set; }
     }
 }

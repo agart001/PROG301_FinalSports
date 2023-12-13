@@ -13,14 +13,12 @@ namespace SportsLibrary.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public int? Age { get; set; }
-        public ILocation? Origin { get; set; }
 
         public BasePerson() : base()
         {
             FirstName = string.Empty;
             LastName = string.Empty;
             Age = 0;
-            Origin = null;
         }
 
         public BasePerson(string? name) : base(name)
@@ -28,24 +26,14 @@ namespace SportsLibrary.Models
             FirstName = string.Empty;
             LastName = string.Empty;
             Age = 0;
-            Origin = null;
         }
 
-        public BasePerson(string? firstName, string? lastName, int? age, ILocation? origin)
+        public BasePerson(string? firstName, string? lastName, int? age)
         {
             FirstName = firstName ?? string.Empty;
             LastName = lastName ?? string.Empty;
             Name = $"{FirstName} {LastName}";
             Age = age ?? 0;
-            Origin = origin;
-        }
-
-        public BasePerson(string? name,string? firstName, string? lastName, int? age, ILocation? origin) : base(name)
-        {
-            FirstName = firstName ?? string.Empty;
-            LastName = lastName ?? string.Empty;
-            Age = age ?? 0;
-            Origin = origin;
         }
 
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)

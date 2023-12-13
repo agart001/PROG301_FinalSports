@@ -23,8 +23,5 @@ namespace SportsLibrary.Interfaces
         /// </summary>
         public int? Age { get; protected set; }
 
-
-        public ILocation? Origin { get; protected set; }
-
     }
 }
