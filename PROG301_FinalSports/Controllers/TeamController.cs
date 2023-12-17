@@ -7,7 +7,7 @@ using SportsLibrary.Models;
 
 namespace PROG301_FinalSports.Controllers
 {
-    public class TeamController : BaseRepoController<Type, object>
+    public class TeamController : BaseRepoController<Type, BasePerson>
     {
         // GET: TeamController
         public ActionResult Index()
@@ -15,7 +15,7 @@ namespace PROG301_FinalSports.Controllers
             var json = TempData["json"] as string;
             if (json == null) throw new NullReferenceException(nameof(TempData));
 
-            var rep = (IRepo<Type, object>)JsonConvert.DeserializeObject<Team>(json);
+            var rep = (IRepo<Type, BasePerson>)JsonConvert.DeserializeObject<Team>(json);
 
             if(rep == null) throw new NullReferenceException(nameof(Team));
             SetVM(rep);

@@ -151,10 +151,10 @@ namespace SportsLibrary.Models
                                 Guid.NewGuid(),
                                 new List<Team>
                                 {
-                                    new Team("LTHS", new Dictionary<Type, ICollection<object>>
+                                    new Team("LTHS", new Dictionary<Type, ICollection<BasePerson>>
                                     {
-                                        {typeof(Staff), new List<object>{ new Staff("Matt", "King") } },
-                                        {typeof(Player), new List<object>{ new Player("Alex", "Gartner") } }
+                                        {typeof(Staff), new List<BasePerson>{ new Staff("Matt", "King") } },
+                                        {typeof(Player), new List<BasePerson>{ new Player("Alex", "Gartner") } }
                                     }),
                                     new Team("HCHS")
                                 }
@@ -206,13 +206,13 @@ namespace SportsLibrary.Models
         public void SetRules(ICollection<string> rules) => Rules = rules;
     }
 
-    public class Team : BaseRepo<Type, object>, ITeam
+    public class Team : BaseRepo<Type, BasePerson>, ITeam
     {
         public Team() : base() { }
         public Team(string? name) : base(name) { }
-        public Team(string? name, Dictionary<Type, ICollection<object>>? contents) : base(name, contents) { }
+        public Team(string? name, Dictionary<Type, ICollection<BasePerson>>? contents) : base(name, contents) { }
         
-        public Team(string? name, Type[] keys, ICollection<object>[] values) : base(name, keys, values) { }
+        public Team(string? name, Type[] keys, ICollection<BasePerson>[] values) : base(name, keys, values) { }
 
         public string? Symbol { get ; set; }
 

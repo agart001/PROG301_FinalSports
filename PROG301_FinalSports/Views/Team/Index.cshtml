@@ -2,13 +2,13 @@
 @using SportsLibrary.Interfaces;
 @using SportsLibrary.Models
 @using SportsLibrary.ViewModels;
-@model SportsLibrary.ViewModels.RepoViewModel<Type, object>
+@model SportsLibrary.ViewModels.RepoViewModel<Type, BasePerson>
 
 @{
     ViewData["Title"] = "Index";
 
     var keys = ViewData["Keys"] as ICollection<Type> ?? throw new NullReferenceException(nameof(ViewData));
-    var values = ViewData["Values"] as ICollection<ICollection<object>> ?? throw new NullReferenceException(nameof(ViewData));
+    var values = ViewData["Values"] as ICollection<ICollection<BasePerson>> ?? throw new NullReferenceException(nameof(ViewData));
 }
 
 <h1>Index</h1>
@@ -27,9 +27,13 @@
     <tbody>
     @foreach(var col in values)
         {
-            @foreach(var val in col)
+            @foreach(var person in col)
             {
-                
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => person.FirstName)
+                    </td>
+                </tr>
             }
         }
     </tbody>

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SportsLibrary.Models
 {
-    public abstract class BasePerson : BaseEntity, IPerson
+    public class BasePerson : BaseEntity, IPerson
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
