@@ -1,60 +1,34 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Newtonsoft.Json;
-using PROG301_FinalSports.Controllers.YourNamespace.Controllers;
-using SportsLibrary.Interfaces;
-using SportsLibrary.Models;
 using SportsLibrary.ViewModels;
 
 namespace PROG301_FinalSports.Controllers
 {
-    public class SportRepoController : BaseRepoController<Guid, Sport>
+    public class MemberController : Controller
     {
-        public SportRepoController()
-        {
-            VM = new RepoViewModel<Guid, Sport>(new SportRepo());
-        }
+        internal PersonViewModel VM { get; set; }
 
 
-        // GET: SportController
+        // GET: MemberController
         public ActionResult Index()
         {
-            ViewData["Keys"] = GetKeys();
-            ViewData["Values"] = GetValues();
-            return View(VM);
+
+            return View();
         }
 
-        [HttpGet]
-        public ActionResult ViewTeams(string sportname)
-        {
-            var hold = sportname;
-            Sport? sport = null;
-            foreach(var col in GetValues())
-            {
-                sport = col.Where(c => c.Name == sportname).FirstOrDefault();
-                if (sport != null) break;
-            }
-
-            if (sport == null) throw new NullReferenceException(sportname);
-            PassRepo(sport);
-
-            return RedirectToAction("Index", "Sport");
-        }
-
-        // GET: SportController/Details/5
+        // GET: MemberController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: SportController/Create
+        // GET: MemberController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: SportController/Create
+        // POST: MemberController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -69,13 +43,13 @@ namespace PROG301_FinalSports.Controllers
             }
         }
 
-        // GET: SportController/Edit/5
+        // GET: MemberController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: SportController/Edit/5
+        // POST: MemberController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -90,13 +64,13 @@ namespace PROG301_FinalSports.Controllers
             }
         }
 
-        // GET: SportController/Delete/5
+        // GET: MemberController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: SportController/Delete/5
+        // POST: MemberController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

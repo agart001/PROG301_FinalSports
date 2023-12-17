@@ -12,17 +12,10 @@ namespace PROG301_FinalSports.Controllers
         // GET: TeamController
         public ActionResult Index()
         {
-            var json = TempData["json"] as string;
-            if (json == null) throw new NullReferenceException(nameof(TempData));
-
-            var rep = (IRepo<Type, BasePerson>)JsonConvert.DeserializeObject<Team>(json);
-
-            if(rep == null) throw new NullReferenceException(nameof(Team));
-            SetVM(rep);
+            ResetRepo<Team>();
 
             ViewData["Keys"] = GetKeys();
             ViewData["Values"] = GetValues();
-            var hold = GetValues();
 
             return View(VM);
         }

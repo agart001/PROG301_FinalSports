@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +57,11 @@ namespace SportsLibrary.Interfaces
     {
         T Data { get; protected set; }
         public void SetStat(T Data);
+    }
+
+    public interface IViewModel<TModel> : INotifyPropertyChanged where TModel : notnull
+    {
+        TModel? Model { get; protected set; }
     }
 
     public interface ICategory : IEntity

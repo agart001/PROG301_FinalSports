@@ -7,6 +7,7 @@ namespace PROG301_FinalSports.Controllers
 {
     using System;
     using System.Collections.Generic;
+    using Microsoft.CodeAnalysis.Scripting.Hosting;
     using Newtonsoft.Json;
     using SportsLibrary.Commands;
     using SportsLibrary.Interfaces;
@@ -14,23 +15,11 @@ namespace PROG301_FinalSports.Controllers
 
     namespace YourNamespace.Controllers
     {
-        public class BaseRepoController<TKey, TValue> : Controller where TKey : notnull
+        public class BaseRepoController<TKey, TValue> : BaseViewModelController<RepoViewModel<TKey, TValue>, IRepo<TKey, TValue>> where TKey : notnull
         {
-            internal object voidarg = new object();
-            public RepoViewModel<TKey, TValue>? VM { get; set; }
+            internal override void SetVM(IRepo<TKey, TValue> vm) => VM = new RepoViewModel<TKey, TValue>(vm);
 
-            internal void SetVM(IRepo<TKey, TValue> vm) => VM = new RepoViewModel<TKey, TValue>(vm);
-
-            internal void ResetVM<TClass>()
-            {
-                var json = TempData["json"] as string;
-                if (json == null) throw new NullReferenceException(nameof(TempData));
-
-                var rep = (IRepo<TKey, TValue>)JsonConvert.DeserializeObject<TClass>(json);
-
-                if (rep == null) throw new NullReferenceException(nameof(TClass));
-                SetVM(rep);
-            }
+            
 
             internal ICollection<TKey> GetKeys()
             {

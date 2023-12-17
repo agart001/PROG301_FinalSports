@@ -1,4 +1,5 @@
 ﻿using SportsLibrary.Commands;
+using SportsLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +13,7 @@ namespace SportsLibrary.ViewModels
     /// <summary>
     /// Base class for view models implementing the <see cref="INotifyPropertyChanged"/> interface.
     /// </summary>
-    public class BaseViewModel<T> : INotifyPropertyChanged
+    public class BaseViewModel<T> : IViewModel<T> where T : notnull
     {
         /// <summary>
         /// Event raised when a property value changes.
@@ -23,12 +24,13 @@ namespace SportsLibrary.ViewModels
         /// Raises the <see cref="PropertyChanged"/> event for the specified property.
         /// </summary>
         /// <param name="name">The name of the property that changed. If not provided, the calling member's name will be used.</param>
-        protected void RaisePropertyChangedEvent([CallerMemberName] string? name = null)
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private protected T? Model { get; set; }
+
+        public T? Model { get; set; }
 
         public BaseViewModel() { }
 

@@ -18,13 +18,7 @@ namespace PROG301_FinalSports.Controllers
 
         public ActionResult Index()
         {
-            var json = TempData["json"] as string;
-            if (json == null) throw new NullReferenceException(nameof(TempData));
-
-            var rep = (IRepo<Guid, Team>)JsonConvert.DeserializeObject<Sport>(json);
-
-            if (rep == null) throw new NullReferenceException(nameof(Sport));
-            SetVM(rep);
+            var json = ResetRepo<Sport>();
 
             ViewData["Keys"] = GetKeys();
             ViewData["Values"] = GetValues();
@@ -34,15 +28,7 @@ namespace PROG301_FinalSports.Controllers
 
         public ActionResult ViewMembers(string teamname)
         {
-            var _json = TempData["json"] as string;
-            if (_json == null) throw new NullReferenceException(nameof(TempData));
-
-            var rep = (IRepo<Guid, Team>)JsonConvert.DeserializeObject<Sport>(_json);
-
-            if (rep == null) throw new NullReferenceException(nameof(Sport));
-            SetVM(rep);
-
-            var hold = GetValues();
+            var _json = ResetRepo<Sport>();
 
             Team? team = null;
             foreach (var col in GetValues())
@@ -52,8 +38,7 @@ namespace PROG301_FinalSports.Controllers
             }
 
             if (team == null) throw new NullReferenceException(teamname);
-            var json = JsonConvert.SerializeObject(team, Formatting.Indented);
-            TempData["json"] = json;
+            PassRepo(team);
             return RedirectToAction("Index", "Team");
         }
 
