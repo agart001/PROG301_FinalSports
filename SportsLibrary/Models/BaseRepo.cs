@@ -8,56 +8,229 @@ using System.Threading.Tasks;
 
 namespace SportsLibrary.Models
 {
-    internal class BaseRepo<TKey, TValue> : BaseEntity, IRepo<TKey, TValue>
+    public abstract class BaseRepo<TKey, TValue> : BaseEntity, IRepo<TKey, TValue> where TKey : notnull
     {
-        public Dictionary<TKey, TValue>? Contents { get; set; }
+        #region Contents
+
+        public Dictionary<TKey, ICollection<TValue>>? Contents { get; set; }
+        public void SetContents(Dictionary<TKey, ICollection<TValue>>? contents) => Contents = contents;
+
+        #endregion
+
+        #region Get
+
+        #region Values
+
+        public ICollection<TValue>? GetValue(TKey key)
+        {
+            if (Contents == null) throw new NullReferenceException(nameof(Contents));
+            return Contents[key];
+        }
+
+        public ICollection<ICollection<TValue>>? GetValues()
+        {
+            if (Contents == null) throw new NullReferenceException(nameof(Contents));
+            return Contents.Values;
+        }
+
+        #endregion
+
+        #region Keys
+
+        public TKey? GetKey(ICollection<TValue> col)
+        {
+            if (Contents == null) throw new NullReferenceException(nameof(Contents));
+            return Contents.FirstOrDefault(kvp => kvp.Value == col).Key;
+        }
+
+        public ICollection<TKey>? GetKeys()
+        {
+            if (Contents == null) throw new NullReferenceException(nameof(Contents));
+            return Contents.Keys;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Add
+
+        public void Add(TKey key, ICollection<TValue> col)
+        {
+            if(Contents == null) throw new NullReferenceException(nameof(Contents));
+            Contents.Add(key, col);
+        }
+
+        public void ValueAdd(TKey key, TValue value)
+        {
+            if (Contents == null) throw new NullReferenceException(nameof(Contents));
+            Contents[key].Add(value);
+        }
+
+        #endregion
+
+        #region Remove
+
+        public void Remove(TKey key)
+        {
+            if (Contents == null) throw new NullReferenceException(nameof(Contents));
+            Contents.Remove(key);
+        }
+
+        public void ValueRemove(TKey key, TValue value)
+        {
+            if (Contents == null) throw new NullReferenceException(nameof(Contents));
+            Contents[key].Remove(value);
+        }
+
+        #endregion
+
+        #region Constructors
 
         public BaseRepo()
         {
-            Contents = new Dictionary<TKey, TValue>();
+            Contents = new Dictionary<TKey, ICollection<TValue>>();
         }
 
-        public BaseRepo(Dictionary<TKey, TValue>? contents)
+        public BaseRepo(string? name) : base(name) { }
+
+        public BaseRepo(string? name, Dictionary<TKey, ICollection<TValue>>? contents) : base(name)
         {
             Contents = contents;
         }
 
-        public BaseRepo(TKey[] keys, TValue[] values)
+        public BaseRepo(string? name, TKey[] keys, ICollection<TValue>[] values) : base(name)
         {
-            Contents = new Dictionary<TKey, TValue>();
-            for(int i = 0; i < keys.Length; i++)
+            Contents = new Dictionary<TKey, ICollection<TValue>>();
+            for (int i = 0; i < keys.Length; i++)
             {
                 Contents.Add(keys[i], values[i]);
             }
         }
 
-        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+        #endregion
+
+    }
+
+    public class TestRepo : BaseRepo<string, int>
+    {
+        public TestRepo()
         {
-            throw new NotImplementedException();
+            Contents = new Dictionary<string, ICollection<int>>
+            {
+                {"test 1", new List<int> { 1, 2, 3, 4 , 5 } },
+                { "test 2", new List<int> { 6, 7, 8, 9, 10 } }
+            };
+        }
+    }
+
+    public class SportRepo : BaseRepo<Guid, Sport>
+    {
+        public SportRepo()
+        {
+            Contents = new Dictionary<Guid, ICollection<Sport>>
+            {
+                {
+                    Guid.NewGuid(), 
+                    new List<Sport>
+                    {
+                        new Sport("MMA", "Combat", new Dictionary<Guid, ICollection<Team>>
+                        {
+                            {
+                                Guid.NewGuid(), 
+                                new List<Team>
+                                {
+                                    new Team("FireHawks"),
+                                    new Team("SnowPigeons")
+                                }
+                            }
+                        }),
+                        new Sport("Wrestling", "Combat", new Dictionary<Guid, ICollection<Team>>
+                        {
+                            {
+                                Guid.NewGuid(),
+                                new List<Team>
+                                {
+                                    new Team("LTHS", new Dictionary<Type, ICollection<object>>
+                                    {
+                                        {typeof(Staff), new List<object>{ new Staff("Matt", "King") } },
+                                        {typeof(Player), new List<object>{ new Player("Alex", "Gartner") } }
+                                    }),
+                                    new Team("HCHS")
+                                }
+                            }
+                        })
+                    }
+                }
+            };
+        }
+    }
+
+    public class Sport : BaseRepo<Guid, Team>, ISport
+    {
+        public Sport() : base() { }
+
+        public Sport(string? name) : base(name) { }
+
+        public Sport(string? name, string category) : base(name) 
+        {
+            Category = category;
         }
 
-        public void Add(TKey key, TValue value)
+        public Sport(string? name, Dictionary<Guid, ICollection<Team>>? contents) : base(name, contents) { }
+
+        public Sport(string? name, string? category, Dictionary<Guid, ICollection<Team>>? contents) : base(name, contents) 
         {
-            Contents.Add(key, value);
+            Category = category ?? throw new ArgumentNullException(nameof(category));
         }
 
-        public void Remove(TKey key)
+        public Sport(string? name, string? category, string? description, Dictionary<Guid, ICollection<Team>>? contents) : base(name, contents)
         {
-            Contents.Remove(key);
+            Category = category ?? throw new ArgumentNullException(nameof(category));
+            Description = description ?? throw new ArgumentNullException(nameof(description));
         }
 
-        public void ValueAdd<T>(TKey key, TValue value)
+        public Sport(string? name, Guid[] keys, ICollection<Team>[] values) : base(name, keys, values) { }
+
+        public Sport(string? name, string? category, Guid[] keys, ICollection<Team>[] values) : base(name, keys, values) 
         {
+            Category = category ?? throw new ArgumentNullException(nameof(category));
         }
 
-        public void ValueRemove(TKey key)
-        {
-            throw new NotImplementedException();
-        }
+        public string Category { get; set; }
+        public ICollection<string> Rules { get; set; }
 
-        public TValue GetValue(TKey key)
+
+        public void SetCategory(string category) => Category = category;
+
+        public void SetRules(ICollection<string> rules) => Rules = rules;
+    }
+
+    public class Team : BaseRepo<Type, object>, ITeam
+    {
+        public Team() : base() { }
+        public Team(string? name) : base(name) { }
+        public Team(string? name, Dictionary<Type, ICollection<object>>? contents) : base(name, contents) { }
+        
+        public Team(string? name, Type[] keys, ICollection<object>[] values) : base(name, keys, values) { }
+
+        public string? Symbol { get ; set; }
+
+        public void SetSymbol(string? symbol) => Symbol = symbol;
+
+        public string? Location { get; set; }
+        public void SetLocation(string? location) => Location = location;
+
+        public int? Wins { get; set; }
+        public void SetWins(int? wins) => Wins = wins;
+
+        public int? Loses { get; set; }
+        public void SetLoses(int? loses) => Loses = loses;
+
+        public double WinLossRatio()
         {
-            throw new NotImplementedException();
+            if (Wins == null || Loses == null) throw new InvalidOperationException(nameof(WinLossRatio));
+            return (double)Wins / (double)Loses;
         }
     }
 }

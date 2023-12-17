@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
+using PROG301_FinalSports.Controllers;
+using SportsLibrary.Interfaces;
+using SportsLibrary.Models;
+using SportsLibrary.ViewModels;
+
 namespace PROG301_FinalSports
 {
     public class Program
@@ -26,9 +32,12 @@ namespace PROG301_FinalSports
 
             app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
 
             app.Run();
         }

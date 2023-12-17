@@ -1,0 +1,36 @@
+﻿@using Newtonsoft.Json;
+@using SportsLibrary.Interfaces;
+@using SportsLibrary.Models
+@using SportsLibrary.ViewModels;
+@model SportsLibrary.ViewModels.RepoViewModel<Type, object>
+
+@{
+    ViewData["Title"] = "Index";
+
+    var keys = ViewData["Keys"] as ICollection<Type> ?? throw new NullReferenceException(nameof(ViewData));
+    var values = ViewData["Values"] as ICollection<ICollection<object>> ?? throw new NullReferenceException(nameof(ViewData));
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var col in values)
+        {
+            @foreach(var val in col)
+            {
+                
+            }
+        }
+    </tbody>
+</table>

@@ -1,0 +1,44 @@
+﻿@using SportsLibrary.Models
+@using SportsLibrary.ViewModels;
+@model SportsLibrary.ViewModels.RepoViewModel<Guid, Team>
+
+@{
+    ViewData["Title"] = "Index";
+
+    var keys = ViewData["Keys"] as ICollection<Guid> ?? throw new NullReferenceException(nameof(ViewData));
+    var values = ViewData["Values"] as ICollection<ICollection<Team>> ?? throw new NullReferenceException(nameof(ViewData));
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Members
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var teams in values)
+        {
+            foreach (var team in teams)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => team.Name)
+                    </td>
+                    <td>
+                        @Html.ActionLink("View Members", "ViewMembers", new { teamname = team.Name })
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
