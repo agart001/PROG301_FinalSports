@@ -11,191 +11,102 @@ using System.Threading.Tasks;
 namespace SportsLibrary.ViewModels
 {
     /// <summary>
-    /// Base class for view models implementing the <see cref="INotifyPropertyChanged"/> interface.
+    /// Represents a base view model for a specific type. Implements <see cref="IViewModel{T}"/>.
     /// </summary>
+    /// <typeparam name="T">The type of the model associated with the view model.</typeparam>
     public class BaseViewModel<T> : IViewModel<T> where T : notnull
     {
+        #region PropertyChanged
+
         /// <summary>
-        /// Event raised when a property value changes.
+        /// Event triggered when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
-        /// Raises the <see cref="PropertyChanged"/> event for the specified property.
+        /// Raises the PropertyChanged event for a specific property.
         /// </summary>
-        /// <param name="name">The name of the property that changed. If not provided, the calling member's name will be used.</param>
+        /// <param name="name">The name of the property that changed. Automatically provided by the compiler if not specified.</param>
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        #endregion
 
-        public T? Model { get; set; }
+        #region GetModelCommand
 
+        /// <summary>
+        /// Gets or sets the command to retrieve the model.
+        /// </summary>
+        public ReturnCommand<T>? GetModelCommand { get; set; }
+
+        /// <summary>
+        /// Flag indicating whether the GetModelCommand can be executed.
+        /// </summary>
+        private bool getModel = false;
+
+        /// <summary>
+        /// Checks if the GetModelCommand can be executed.
+        /// </summary>
+        /// <param name="parameter">The command parameter, not used in this case.</param>
+        /// <returns>True if the command can be executed, otherwise false.</returns>
+        private bool CanGetModel(object parameter) => getModel;
+
+        /// <summary>
+        /// Executes the GetModelCommand to retrieve the model.
+        /// </summary>
+        /// <param name="parameter">The command parameter, not used in this case.</param>
+        /// <returns>The model.</returns>
+        private T GetModel(object parameter)
+        {
+            if(Model == null) throw new NullReferenceException(nameof(Model));
+            return Model;
+        }
+
+        #endregion
+
+        #region Model
+
+        /// <summary>
+        /// Gets or sets the associated model.
+        /// </summary>
+        private T? model;
+
+        /// <summary>
+        /// Gets or sets the associated model. Raises PropertyChanged event for "Model" when set.
+        /// </summary>
+        internal T? Model
+        {
+            get => model;
+            set
+            {
+                model = value;
+                OnPropertyChanged(nameof(Model));
+            }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Default constructor for BaseViewModel.
+        /// </summary>
         public BaseViewModel() { }
 
+        /// <summary>
+        /// Constructor for BaseViewModel with an initial model.
+        /// Initializes a new instance with the provided model and sets up the GetModelCommand.
+        /// </summary>
+        /// <param name="model">The initial model for the view model.</param>
         public BaseViewModel(T model)
         {
+            getModel = true;
+            GetModelCommand = new ReturnCommand<T>(GetModel, CanGetModel);
             Model = model;
         }
-    }
-
-    /// <summary>
-    /// ViewModel for managing an collection of items.
-    /// </summary>
-    /// <typeparam name="T">Type of items in the collection.</typeparam>
-    public class ICollectionViewModel<T> : BaseViewModel<ICollection<T>>
-    {
-        private ICollection<T> collection = null;
-
-        #region collection
-
-        /// <summary>
-        /// Gets the collection of items.
-        /// </summary>
-        public ICollection<T> Col
-        {
-            get
-            {
-                GetCol.Execute(null);
-                return GetCol.Result;
-            }
-        }
-
-        private ReturnCommand<ICollection<T>> GetCol { get; set; }
-
-        private bool getCol = false;
-
-        private bool CanGetCol(object parameter) => getCol;
-
-        private ICollection<T> ReturnCol(object parameter)
-        {
-            return collection;
-        }
 
         #endregion
-
-        #region Count
-
-        /// <summary>
-        /// Gets the count of items in the collection.
-        /// </summary>
-        public int Count
-        {
-            get
-            {
-                GetCount.Execute(null);
-                return GetCount.Result;
-            }
-        }
-
-        private ReturnCommand<int> GetCount { get; set; }
-
-        private bool getCount = false;
-
-        private bool CanGetCount(object parameter) => getCount;
-
-        private int ReturnCount(object parameter)
-        {
-            return collection.Count();
-        }
-
-        #endregion
-
-        #region Content Type
-
-        /// <summary>
-        /// Gets the type of the content in the collection.
-        /// </summary>
-        public Type ContentType
-        {
-            get
-            {
-                if (collection != null)
-                {
-                    var first = collection.FirstOrDefault();
-                    GetContentType.Execute(first ?? throw new NullReferenceException(nameof(first)));
-                }
-                return GetContentType.Result;
-            }
-        }
-
-        private ReturnCommand<Type> GetContentType { get; set; }
-
-        private bool getContentType = false;
-
-        private bool CanGetContentType(object parameter) => getContentType;
-
-        private Type ReturnContentType(object parameter)
-        {
-            if (parameter == null) throw new ArgumentNullException(nameof(parameter));
-            return parameter.GetType();
-        }
-
-        #endregion
-
-        #region Content Fields
-
-        /// <summary>
-        /// Gets the fields and their values of the content in the collection.
-        /// </summary>
-        public Dictionary<string, object> ContentFields
-        {
-            get
-            {
-                if (collection != null)
-                {
-                    var first = collection.FirstOrDefault();
-                    GetContentFields.Execute(first);
-                }
-                return GetContentFields.Result;
-            }
-        }
-
-        private ReturnCommand<Dictionary<string, object>> GetContentFields { get; set; }
-
-        private bool getContentFields = false;
-        private bool CanGetContentFields(object parameter) => getContentFields;
-
-        private Dictionary<string, object> ReturnContentFields(object parameter)
-        {
-            if (parameter == null) throw new ArgumentNullException(nameof(parameter));
-
-            Dictionary<string, object> result = new Dictionary<string, object>();
-
-            Type type = parameter.GetType();
-
-            var properties = type.GetProperties();
-
-            foreach (var property in properties)
-            {
-                result[property.Name] = property.GetValue(parameter) ?? throw new NullReferenceException(nameof(parameter));
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ICollectionViewModel{T}"/> class.
-        /// </summary>
-        /// <param name="_collection">The collection of items.</param>
-        /// <param name="_getCol">Flag indicating whether to retrieve the collection.</param>
-        /// <param name="_getCount">Flag indicating whether to retrieve the count of items.</param>
-        /// <param name="_getContentType">Flag indicating whether to retrieve the content type.</param>
-        /// <param name="_getContentFields">Flag indicating whether to retrieve the content fields.</param>
-        public ICollectionViewModel(ICollection<T> data) : base(data)
-        {
-            getCol = true;
-            getCount = true;
-            getContentType = true;
-            getContentFields = true;
-
-            GetCol = new ReturnCommand<ICollection<T>>(ReturnCol, CanGetCol);
-            GetCount = new ReturnCommand<int>(ReturnCount, CanGetCount);
-            GetContentType = new ReturnCommand<Type>(ReturnContentType, CanGetContentType);
-            GetContentFields = new ReturnCommand<Dictionary<string, object>>(ReturnContentFields, CanGetContentFields);
-        }
     }
 }

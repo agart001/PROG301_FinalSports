@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace SportsLibrary.ViewModels
 {
+    /// <summary>
+    /// Represents a view model for a person. Inherits from <see cref="BaseViewModel{T}"/> with T as <see cref="BasePerson"/>.
+    /// </summary>
     public class PersonViewModel : BaseViewModel<BasePerson>
     {
-        public PersonViewModel()
-        {
-        }
+        #region Properties
 
-        public PersonViewModel(BasePerson data) : base(data)
-        {
-        }
-
+        /// <summary>
+        /// Gets or sets the first name of the person.
+        /// </summary>
         public string? FirstName
         {
             get { return Model?.FirstName; }
@@ -31,6 +31,9 @@ namespace SportsLibrary.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets or sets the last name of the person.
+        /// </summary>
         public string? LastName
         {
             get { return Model?.LastName; }
@@ -44,6 +47,9 @@ namespace SportsLibrary.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets or sets the age of the person.
+        /// </summary>
         public int? Age
         {
             get { return Model?.Age; }
@@ -57,6 +63,9 @@ namespace SportsLibrary.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets or sets the position of the person.
+        /// </summary>
         public string? Position
         {
             get { return Model?.Position; }
@@ -70,84 +79,26 @@ namespace SportsLibrary.ViewModels
             }
         }
 
-        public ICollection<string>? Duties
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Default constructor for PersonViewModel.
+        /// </summary>
+        public PersonViewModel()
         {
-            get { return Model?.Duties; }
-            set
-            {
-                if (Model != null)
-                {
-                    Model.Duties = value;
-                    OnPropertyChanged();
-                }
-            }
         }
 
-        public decimal? Salary
+        /// <summary>
+        /// Constructor for PersonViewModel with an initial person data.
+        /// Initializes a new instance with the provided person data.
+        /// </summary>
+        /// <param name="data">The initial person data for the view model.</param>
+        public PersonViewModel(BasePerson data) : base(data)
         {
-            get { return Model?.Salary; }
-            set
-            {
-                if (Model != null)
-                {
-                    Model.Salary = value;
-                    OnPropertyChanged();
-                }
-            }
         }
 
-        public void SetFirstName(string firstName)
-        {
-            if (Model != null)
-            {
-                Model.SetFirstName(firstName);
-                OnPropertyChanged(nameof(FirstName));
-            }
-        }
-
-        public void SetLastName(string lastName)
-        {
-            if (Model != null)
-            {
-                Model.SetLastName(lastName);
-                OnPropertyChanged(nameof(LastName));
-            }
-        }
-
-        public void SetAge(int age)
-        {
-            if (Model != null)
-            {
-                Model.SetAge(age);
-                OnPropertyChanged(nameof(Age));
-            }
-        }
-
-        public void SetPosition(string position)
-        {
-            if (Model != null)
-            {
-                Model.SetPosition(position);
-                OnPropertyChanged(nameof(Position));
-            }
-        }
-
-        public void SetDuties(ICollection<string> duties)
-        {
-            if (Model != null)
-            {
-                Model.SetDuties(duties);
-                OnPropertyChanged(nameof(Duties));
-            }
-        }
-
-        public void SetSalary(decimal salary)
-        {
-            if (Model != null)
-            {
-                Model.SetSalary(salary);
-                OnPropertyChanged(nameof(Salary));
-            }
-        }
+        #endregion
     }
 }

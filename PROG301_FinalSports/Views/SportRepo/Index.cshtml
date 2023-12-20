@@ -1,48 +1,90 @@
-﻿@using SportsLibrary.Models;
-@model SportsLibrary.ViewModels.RepoViewModel<Guid, Sport>
+﻿@using Newtonsoft.Json;
+@using SportsLibrary.Interfaces;
+@using SportsLibrary.Models;
+@using SportsLibrary.Utilities;
+@model SportsLibrary.ViewModels.RepoViewModel<Category, Sport>
 
 @{
-    ViewData["Title"] = "Index";
-    var keys = ViewData["Keys"] as ICollection<Guid> ?? throw new NullReferenceException(nameof(ViewData));
-    var values = ViewData["Values"] as ICollection<ICollection<Sport>> ?? throw new NullReferenceException(nameof(ViewData));
+    ViewData["Title"] = "Sport Repo Index";
+    var contents = ViewData["Contents"] as List<KeyValuePair<Category, ICollection<Sport>>> 
+    ?? throw new NullReferenceException(nameof(ViewData));
 }
 
-<h1>Index</h1>
+<h1>Sport Repo</h1>
+
 
 <p>
-    <a asp-action="Create">Create New</a>
+    @Html.ActionLink("Add Category", "AddCategory", "SportRepo")
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Category
-            </th>
-            <th>
-                Name
-            </th>
-            <th>
-                Teams
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(var sports in values)
-        {
-            foreach(var sport in sports)
-            {
+@foreach(var kvp in contents)
+{
+    var _kjson = JsonUtils.Serialize(kvp.Key);
+    <div style=
+        "display: flex;
+        flex-flow: column;
+        justify-content: space-evenly;
+        align-items: center;
+        margin: 1rem, 0;
+        border: .25rem solid black">
+        <div style="display: flex;
+        flex-flow: row;
+        justify-content: space-evenly;
+        align-items: center;
+        width: 100%;
+        border-bottom: .25rem solid black">
+            <h4>
+                Name: @kvp.Key.Name
+            </h4>
+            <h4>
+                Description: @kvp.Key.Description
+            </h4>
+            <h4>
+                @Html.ActionLink("Add Sport", "AddSport", "SportRepo", new{
+            json = _kjson
+            })
+            </h4>
+        </div>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => sport.Category)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => sport.Name)
-                    </td>
-                    <td>
-                        @Html.ActionLink("View Teams", "ViewTeams", "SportRepo", new { sportname = sport.Name })
-                    </td>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                    <th>
+                        Teams
+                    </th>
+                    <th>
+                        View
+                    </th>
                 </tr>
-            }
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                @foreach (var sport in kvp.Value)
+                {
+                    var count = kvp.Value.Count();
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => sport.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => sport.Description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => count)
+                        </td>
+                        <td>
+                            @Html.ActionLink("View Teams", "ViewTeams", "SportRepo", new
+                    {
+                    control = "Sport",
+                    name = sport.Name
+                    })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

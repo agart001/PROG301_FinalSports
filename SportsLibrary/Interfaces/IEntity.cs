@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SportsLibrary.Commands;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace SportsLibrary.Interfaces
 {
+    /// <summary>
+    /// Interface representing an entity which contracts <see cref="ISerializable"/>.
+    /// </summary>
     public interface IEntity : ISerializable
     {
         /// <summary>
@@ -53,18 +57,22 @@ namespace SportsLibrary.Interfaces
         public string? About();
     }
 
+    /// <summary>
+    /// Interface representing a "stat", or statistic, which contracts <see cref="IEntity"/>.
+    /// </summary>
+    /// <typeparam name="T">The statistic data.</typeparam>
     public interface IStat<T> : IEntity
     {
-        T Data { get; protected set; }
+        T? Data { get; protected set; }
         public void SetStat(T Data);
     }
 
+    /// <summary>
+    /// Interface representing a view model, which <see cref="INotifyPropertyChanged"/>.
+    /// </summary>
+    /// <typeparam name="TModel">The model with in the view which is <see langword="notnull"/>.</typeparam>
     public interface IViewModel<TModel> : INotifyPropertyChanged where TModel : notnull
     {
-        TModel? Model { get; protected set; }
-    }
-
-    public interface ICategory : IEntity
-    {
+        public ReturnCommand<TModel>? GetModelCommand { get; set; }
     }
 }

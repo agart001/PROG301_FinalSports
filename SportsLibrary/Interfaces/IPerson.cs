@@ -1,6 +1,9 @@
 ﻿
 namespace SportsLibrary.Interfaces
 {
+    /// <summary>
+    /// Interface representing a person, which contracts <see cref="IEntity"/>.
+    /// </summary>
     public interface IPerson : IEntity
     {
         #region First Name
@@ -57,38 +60,11 @@ namespace SportsLibrary.Interfaces
         public void SetPosition(string position);
 
         #endregion
-
-        #region Duties
-
-        /// <summary>
-        /// A Worker's, public get and protected set, List<string> of their duties(responsibilities).
-        /// </summary>
-        public ICollection<string>? Duties { get; protected set; }
-
-        /// <summary>
-        /// Sets a person's duties.
-        /// </summary>
-        /// <param name="duties">The duties to be set.</param>
-        public void SetDuties(ICollection<string> duties);
-
-        #endregion
-
-        #region Salary
-
-        /// <summary>
-        /// A Worker's, public get and protected set, decimal salary(pay).
-        /// </summary>
-        public decimal? Salary { get; protected set; }
-
-        /// <summary>
-        /// Sets a person's salary.
-        /// </summary>
-        /// <param name="salary">The salary to be set.</param>
-        public void SetSalary(decimal salary);
-
-        #endregion
     }
 
+    /// <summary>
+    /// Interface representing a staff member, which contracts <see cref="IPerson"/>.
+    /// </summary>
     public interface IStaff : IPerson 
     {
         #region Team
@@ -96,7 +72,7 @@ namespace SportsLibrary.Interfaces
         /// <summary>
         /// A Player's, public get and protected set, ITeam team.
         /// </summary>
-        public ITeam Team { get; protected set; }
+        public ITeam? Team { get; protected set; }
 
         /// <summary>
         /// Sets a player's team.
@@ -108,6 +84,9 @@ namespace SportsLibrary.Interfaces
 
     }
 
+    /// <summary>
+    /// Interface representing a player, which contracts <see cref="IPerson"/>.
+    /// </summary>
     public interface IPlayer : IPerson
     {
         #region Team
@@ -115,7 +94,7 @@ namespace SportsLibrary.Interfaces
         /// <summary>
         /// A Player's, public get and protected set, ITeam team.
         /// </summary>
-        public ITeam Team { get; protected set; }
+        public ITeam? Team { get; protected set; }
 
         /// <summary>
         /// Sets a player's team.
@@ -130,7 +109,7 @@ namespace SportsLibrary.Interfaces
         /// <summary>
         /// A Player's, public get and protected set, Dictionary<string, object> stats.
         /// </summary>
-        public ICollection<IStat<object>> Stats { get; protected set; }
+        public ICollection<IStat<object>>? Stats { get; protected set; }
 
         /// <summary>
         /// Sets a player's stats.

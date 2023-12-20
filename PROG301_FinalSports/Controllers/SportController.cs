@@ -1,115 +1,177 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using PROG301_FinalSports.Controllers.YourNamespace.Controllers;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SportsLibrary.Interfaces;
 using SportsLibrary.Models;
+using SportsLibrary.Utilities;
 using SportsLibrary.ViewModels;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 
 namespace PROG301_FinalSports.Controllers
 {
-    public class SportController : BaseRepoController<Guid, Team>
+    /// <summary>
+    /// Controller for managing sports-related actions.
+    /// </summary>
+    public class SportController : BaseRepoController<Category, Team>
     {
-        private readonly IRepo<Guid, Team> _repo;
+        #region Constructor
 
-        // GET: SportController
-
-        public ActionResult Index()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SportController"/> class.
+        /// </summary>
+        public SportController()
         {
-            var json = ResetRepo<Sport>();
+            VM = new RepoViewModel<Category, Team>(new Sport());
+        }
 
-            ViewData["Keys"] = GetKeys();
-            ViewData["Values"] = GetValues();
-            TempData["json"] = json;
+        #endregion
+
+        #region Action Methods
+
+        /// <summary>
+        /// Displays the index view for the SportController.
+        /// </summary>
+        /// <param name="name">The name parameter for the index view.</param>
+        /// <returns>The index view.</returns>
+        public ActionResult Index(string name)
+        {
+            var session_json = HttpContext.Session.GetString("Repo");
+            if(session_json == null) throw new NullReferenceException(nameof(session_json));
+
+            var _json = JsonUtils.SearchJsonForStringValue(session_json, name);
+            var model = JsonUtils.Deserialize<Sport>(_json);
+            TempData["InitPass"] = _json;
+            TempData["InitName"] = name;
+            VM = new RepoViewModel<Category, Team>(model);
+
+            ViewData["Contents"] = GetContents();
+            ViewData["Name"] = name;
             return View(VM);
         }
 
-        public ActionResult ViewMembers(string teamname)
+        /// <summary>
+        /// Redirects to the action for viewing members.
+        /// </summary>
+        /// <param name="control">The control parameter for the view members action.</param>
+        /// <param name="name">The name parameter for the view members action.</param>
+        /// <returns>The action result for viewing members.</returns>
+        public ActionResult ViewMembers(string control, string name)
         {
-            var _json = ResetRepo<Sport>();
-
-            Team? team = null;
-            foreach (var col in GetValues())
-            {
-                team = col.Where(c => c.Name == teamname).FirstOrDefault();
-                if (team != null) break;
-            }
-
-            if (team == null) throw new NullReferenceException(teamname);
-            PassRepo(team);
-            return RedirectToAction("Index", "Team");
+            return SelectContents(control, name);
         }
 
+        #region Category
 
-        // GET: SportController/Details/5
-        public ActionResult Details(int id)
+        /// <summary>
+        /// Displays the add category view for the SportController.
+        /// </summary>
+        /// <returns>The add category view.</returns>
+        public ActionResult AddCategory()
         {
+            var name = TempData["InitName"];
+            var mod = TempData["InitPass"];
+            TempData["ActionPass"] = mod;
+            TempData["ActionName"] = name;
             return View();
         }
 
-        // GET: SportController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: SportController/Create
+        /// <summary>
+        /// Handles the HTTP POST request for adding a category in the SportController.
+        /// </summary>
+        /// <param name="collection">The form collection from the POST request.</param>
+        /// <returns>The action result after processing the add category request.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult AddCategory(IFormCollection collection)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var mod = TempData["ActionPass"] as string;
+            if(mod == null) throw new NullReferenceException(nameof(mod));
+
+            var _name = TempData["ActionName"] as string;
+            if(_name == null) throw new NullReferenceException(nameof(_name));
+
+            ResetVMModel<Sport>(mod);
+
+            var name = collection["Name"];
+            var description = collection["Description"];
+            var category = new Category(name, description);
+            AddKey(category);
+
+            var _json = SerializeVM();
+
+            var session_json = HttpContext.Session.GetString("Repo");
+            if(session_json == null) throw new NullReferenceException(nameof(session_json));
+
+            var updated = JsonUtils.ReplaceJsonStringValue(session_json, _name, _json);
+            HttpContext.Session.SetString("Repo", updated);
+
+            return RedirectToAction("Index", new { name = _name });
         }
 
-        // GET: SportController/Edit/5
-        public ActionResult Edit(int id)
+        #endregion
+
+        #region Team
+
+        /// <summary>
+        /// Displays the add team view for the SportController.
+        /// </summary>
+        /// <param name="json">The JSON data parameter for the add team view.</param>
+        /// <returns>The add team view.</returns>
+        public ActionResult AddTeam(string json)
         {
+            var name = TempData["InitName"];
+            var mod = TempData["InitPass"];
+            TempData["ActionPass"] = mod;
+            TempData["ActionName"] = name;
+            TempData["key"] = json;
             return View();
         }
 
-        // POST: SportController/Edit/5
+        /// <summary>
+        /// Handles the HTTP POST request for adding a team in the SportController.
+        /// </summary>
+        /// <param name="collection">The form collection from the POST request.</param>
+        /// <returns>The action result after processing the add team request.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult AddTeam(IFormCollection collection)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var json = TempData["key"] as string 
+                ?? throw new NullReferenceException(nameof(TempData));
+
+            var key = JsonUtils.Deserialize<Category>(json);
+
+            var mod = TempData["ActionPass"] as string 
+                ?? throw new NullReferenceException(nameof(TempData));
+
+            var _name = TempData["ActionName"] as string 
+                ?? throw new NullReferenceException(nameof(TempData));
+
+            ResetVMModel<Sport>(mod);
+
+            var name = collection["Name"];
+            var description = collection["Description"];
+            var wins = int.Parse(collection["Wins"]);
+            var loses = int.Parse(collection["Loses"]);
+
+            var team = new Team(name, description, wins, loses);
+            ValueAdd(key, team);
+
+            var _json = SerializeVM();
+            var session_json = HttpContext.Session.GetString("Repo") 
+                ?? throw new NullReferenceException(nameof(HttpContext.Session));
+
+            var updated = JsonUtils.ReplaceJsonStringValue(session_json, _name, _json);
+            HttpContext.Session.SetString("Repo", updated);
+
+            return RedirectToAction("Index", new { name = _name });
         }
 
-        // GET: SportController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        #endregion
 
-        // POST: SportController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        #endregion
     }
 }

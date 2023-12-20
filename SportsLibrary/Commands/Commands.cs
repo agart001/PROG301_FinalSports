@@ -8,10 +8,12 @@ using System.Windows.Input;
 namespace SportsLibrary.Commands
 {
     /// <summary>
-    /// Represents a basic implementation of the ICommand interface.
+    /// Represents a basic, void, command. Implements <see cref="ICommand"/>.
     /// </summary>
     public class BasicCommand : ICommand
     {
+        #region Delegates
+
         /// <summary>
         /// Represents a method that will be called to execute the command.
         /// </summary>
@@ -28,6 +30,52 @@ namespace SportsLibrary.Commands
         private readonly IExecute execute;
         private readonly ICanExecute canExecute;
 
+        #endregion
+
+        #region Execute
+
+        /// <summary>
+        /// Determines whether the command can be executed.
+        /// </summary>
+        /// <param name="parameter">The parameter for the command.</param>
+        /// <returns>True if the command can be executed; otherwise, false.</returns>
+        public bool CanExecute(object? parameter)
+        {
+            if(parameter == null) throw new ArgumentNullException(nameof(parameter));
+            return canExecute.Invoke(parameter);
+        }
+
+        /// <summary>
+        /// Executes the command.
+        /// </summary>
+        /// <param name="parameter">The parameter for the command.</param>
+        public void Execute(object? parameter)
+        {
+            if (parameter == null) throw new ArgumentNullException(nameof(parameter));
+            execute.Invoke(parameter);
+        }
+
+        #endregion
+
+        #region EventHandler
+
+        /// <summary>
+        /// Occurs when changes occur that affect whether the command should execute.
+        /// </summary>
+        public event EventHandler? CanExecuteChanged;
+
+        /// <summary>
+        /// Raises the CanExecuteChanged event.
+        /// </summary>
+        protected virtual void OnCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        #endregion
+
+        #region Constructor
+
         /// <summary>
         /// Initializes a new instance of the BasicCommand class.
         /// </summary>
@@ -40,45 +88,17 @@ namespace SportsLibrary.Commands
             canExecute = _canExecute ?? throw new ArgumentNullException(nameof(_canExecute));
         }
 
-        /// <summary>
-        /// Determines whether the command can be executed.
-        /// </summary>
-        /// <param name="parameter">The parameter for the command.</param>
-        /// <returns>True if the command can be executed; otherwise, false.</returns>
-        public bool CanExecute(object parameter)
-        {
-            return canExecute.Invoke(parameter);
-        }
-
-        /// <summary>
-        /// Executes the command.
-        /// </summary>
-        /// <param name="parameter">The parameter for the command.</param>
-        public void Execute(object parameter)
-        {
-            execute.Invoke(parameter);
-        }
-
-        /// <summary>
-        /// Occurs when changes occur that affect whether the command should execute.
-        /// </summary>
-        public event EventHandler CanExecuteChanged;
-
-        /// <summary>
-        /// Raises the CanExecuteChanged event.
-        /// </summary>
-        protected virtual void OnCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+        #endregion
     }
 
     /// <summary>
-    /// Represents a command that returns a result of type TResult when executed.
+    /// Represents a command that returns a result of executed method. Implements <see cref="ICommand"/>.
     /// </summary>
     /// <typeparam name="TResult">The type of the result returned by the command.</typeparam>
     public class ReturnCommand<TResult> : ICommand
     {
+        #region Delegates
+
         /// <summary>
         /// Represents a method that will be called to execute the command and return a result.
         /// </summary>
@@ -96,6 +116,58 @@ namespace SportsLibrary.Commands
         private readonly IExecute execute;
         private readonly ICanExecute canExecute;
 
+        #endregion
+
+        #region Execute
+
+        /// <summary>
+        /// Determines whether the command can be executed.
+        /// </summary>
+        /// <param name="parameter">The parameter for the command.</param>
+        /// <returns>True if the command can be executed; otherwise, false.</returns>
+        public bool CanExecute(object? parameter)
+        {
+            if (parameter == null) throw new ArgumentNullException(nameof(parameter));
+            return canExecute.Invoke(parameter);
+        }
+
+        /// <summary>
+        /// Gets the result of the command.
+        /// </summary>
+        public TResult? Result { get; private set; }
+
+        /// <summary>
+        /// Executes the command and sets the result.
+        /// </summary>
+        /// <param name="parameter">The parameter for the command.</param>
+        public void Execute(object? parameter)
+        {
+            if (parameter == null) throw new ArgumentNullException(nameof(parameter));
+            // Set the result
+            Result = execute.Invoke(parameter);
+        }
+
+        #endregion
+
+        #region EventHandler
+
+        /// <summary>
+        /// Occurs when changes occur that affect whether the command should execute.
+        /// </summary>
+        public event EventHandler? CanExecuteChanged;
+
+        /// <summary>
+        /// Raises the CanExecuteChanged event.
+        /// </summary>
+        protected virtual void OnCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        #endregion
+
+        #region Constructor
+
         /// <summary>
         /// Initializes a new instance of the ReturnCommand class.
         /// </summary>
@@ -108,42 +180,6 @@ namespace SportsLibrary.Commands
             canExecute = _canExecute ?? throw new ArgumentNullException(nameof(_canExecute));
         }
 
-        /// <summary>
-        /// Determines whether the command can be executed.
-        /// </summary>
-        /// <param name="parameter">The parameter for the command.</param>
-        /// <returns>True if the command can be executed; otherwise, false.</returns>
-        public bool CanExecute(object parameter)
-        {
-            return canExecute.Invoke(parameter);
-        }
-
-        /// <summary>
-        /// Gets the result of the command.
-        /// </summary>
-        public TResult Result { get; private set; }
-
-        /// <summary>
-        /// Executes the command and sets the result.
-        /// </summary>
-        /// <param name="parameter">The parameter for the command.</param>
-        public void Execute(object parameter)
-        {
-            // Set the result
-            Result = execute.Invoke(parameter);
-        }
-
-        /// <summary>
-        /// Occurs when changes occur that affect whether the command should execute.
-        /// </summary>
-        public event EventHandler CanExecuteChanged;
-
-        /// <summary>
-        /// Raises the CanExecuteChanged event.
-        /// </summary>
-        protected virtual void OnCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+        #endregion
     }
 }

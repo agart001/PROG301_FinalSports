@@ -1,40 +1,91 @@
 ﻿@using Newtonsoft.Json;
 @using SportsLibrary.Interfaces;
 @using SportsLibrary.Models
+@using SportsLibrary.Utilities;
 @using SportsLibrary.ViewModels;
-@model SportsLibrary.ViewModels.RepoViewModel<Type, BasePerson>
+@model SportsLibrary.ViewModels.RepoViewModel<Category, BasePerson>
 
 @{
     ViewData["Title"] = "Index";
-
-    var keys = ViewData["Keys"] as ICollection<Type> ?? throw new NullReferenceException(nameof(ViewData));
-    var values = ViewData["Values"] as ICollection<ICollection<BasePerson>> ?? throw new NullReferenceException(nameof(ViewData));
+    var name = ViewData["Name"] as string;
+    var contents = ViewData["Contents"] as List<KeyValuePair<Category, ICollection<BasePerson>>> 
+    ?? throw new NullReferenceException(nameof(ViewData));
 }
 
-<h1>Index</h1>
+<h1>Team: @name </h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    @Html.ActionLink("Add Category", "AddCategory", "Team")
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Name
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach(var col in values)
-        {
-            @foreach(var person in col)
+@foreach(var kvp in contents)
+{
+    var _kjson = JsonUtils.Serialize(kvp.Key);
+    <div style="display: flex;
+        flex-flow: column;
+        justify-content: space-evenly;
+        align-items: center;
+        margin: 1rem, 0;
+        border: .25rem solid black">
+        <div style="display: flex;
+            flex-flow: row;
+            justify-content: space-evenly;
+            align-items: center;
+            width: 100%;
+            border-bottom: .25rem solid black">
+            <h4>
+                Name: @kvp.Key.Name
+            </h4>
+            <h4>
+                Description: @kvp.Key.Description
+            </h4>
+            <h4>
+                @Html.ActionLink("Add Member", "AddMember", "Team", new
             {
+            json = _kjson
+            })
+            </h4>
+        </div>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => person.FirstName)
-                    </td>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Age
+                    </th>
+                    <th>
+                        Position
+                    </th>
+                    <th>
+                        View
+                    </th>
                 </tr>
-            }
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                @foreach (var person in kvp.Value)
+                {
+                    var count = kvp.Value.Count();
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => person.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => person.Age)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => person.Position)
+                        </td>
+                        <td>
+                            @Html.ActionLink("View Member", "ViewMember", "Team", new
+                    {
+                    control = "Member",
+                    json = person.Name
+                    })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,114 +1,163 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Session;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Newtonsoft.Json;
-using PROG301_FinalSports.Controllers.YourNamespace.Controllers;
+using SportsLibrary.Utilities;
 using SportsLibrary.Interfaces;
 using SportsLibrary.Models;
 using SportsLibrary.ViewModels;
+using System.Xml.Linq;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json.Linq;
+using NuGet.Protocol;
+using Microsoft.Extensions.Hosting.Internal;
+using System.Reflection;
 
 namespace PROG301_FinalSports.Controllers
 {
-    public class SportRepoController : BaseRepoController<Guid, Sport>
+    /// <summary>
+    /// Controller for managing sports repositories.
+    /// </summary>
+    public class SportRepoController : BaseRepoController<Category, Sport>
     {
-        public SportRepoController()
-        {
-            VM = new RepoViewModel<Guid, Sport>(new SportRepo());
-        }
+        #region Action Methods
 
-
-        // GET: SportController
+        /// <summary>
+        /// Displays the index view for the SportRepoController.
+        /// </summary>
+        /// <returns>The index view.</returns>
         public ActionResult Index()
         {
-            ViewData["Keys"] = GetKeys();
-            ViewData["Values"] = GetValues();
+            var session_json = HttpContext.Session.GetString("Repo");
+
+            // Check if session has existing data
+            if (session_json != null)
+            {
+                ResetVMModel<SportRepo>(session_json);
+            }
+            else
+            {
+                // Load startup data from file if session is empty
+                var baseDir = Directory.GetParent(Directory.GetCurrentDirectory());
+                var path = Path.Combine($"{baseDir}\\SportsLibrary\\JSONs\\startupRepo.json");
+                var startupJson = System.IO.File.ReadAllText(path);
+                var startup = JsonUtils.Deserialize<SportRepo>(startupJson);
+
+                VM = new RepoViewModel<Category, Sport>(startup);
+            }
+
+            if(VM == null || VM.GetModelCommand == null) throw new NullReferenceException(nameof(VM));
+
+            VM.GetModelCommand.Execute(voidarg);
+            var model = VM.GetModelCommand.Result 
+                ?? throw new ArgumentNullException(nameof(VM.GetModelCommand.Result));
+            var _json = JsonUtils.Serialize(model);
+
+            ViewData["Contents"] = model.Contents;
+            HttpContext.Session.SetString("Repo", _json);
             return View(VM);
         }
 
-        [HttpGet]
-        public ActionResult ViewTeams(string sportname)
+        /// <summary>
+        /// Redirects to the action for viewing teams.
+        /// </summary>
+        /// <param name="control">The control parameter for the view teams action.</param>
+        /// <param name="name">The name parameter for the view teams action.</param>
+        /// <returns>The action result for viewing teams.</returns>
+        public ActionResult ViewTeams(string control, string name)
         {
-            var hold = sportname;
-            Sport? sport = null;
-            foreach(var col in GetValues())
-            {
-                sport = col.Where(c => c.Name == sportname).FirstOrDefault();
-                if (sport != null) break;
-            }
-
-            if (sport == null) throw new NullReferenceException(sportname);
-            PassRepo(sport);
-
-            return RedirectToAction("Index", "Sport");
+            return SelectContents(control, name);
         }
 
-        // GET: SportController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        #region Category
 
-        // GET: SportController/Create
-        public ActionResult Create()
+        /// <summary>
+        /// Displays the add category view for the SportRepoController.
+        /// </summary>
+        /// <returns>The add category view.</returns>
+        public ActionResult AddCategory()
         {
             return View();
         }
 
-        // POST: SportController/Create
+        /// <summary>
+        /// Handles the HTTP POST request for adding a category in the SportRepoController.
+        /// </summary>
+        /// <param name="collection">The form collection from the POST request.</param>
+        /// <returns>The action result after processing the add category request.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult AddCategory(IFormCollection collection)
         {
-            try
+            if (VM == null)
             {
-                return RedirectToAction(nameof(Index));
+                // Restore VM from session if it's null
+                var rep = HttpContext.Session.GetString("Repo") 
+                    ?? throw new NullReferenceException(nameof(HttpContext.Session));
+                ResetVMModel<SportRepo>(rep);
             }
-            catch
-            {
-                return View();
-            }
+
+            var name = collection["Name"];
+            var description = collection["Description"];
+            var category = new Category(name, description);
+            AddKey(category);
+
+            var updated = SerializeVM();
+            HttpContext.Session.SetString("Repo", updated);
+
+            return RedirectToAction("Index");
         }
 
-        // GET: SportController/Edit/5
-        public ActionResult Edit(int id)
+        #endregion
+
+        #region Sport
+
+        /// <summary>
+        /// Displays the add sport view for the SportRepoController.
+        /// </summary>
+        /// <param name="json">The JSON data parameter for the add sport view.</param>
+        /// <returns>The add sport view.</returns>
+        public ActionResult AddSport(string json)
         {
+            TempData["key"] = json;
             return View();
         }
 
-        // POST: SportController/Edit/5
+        /// <summary>
+        /// Handles the HTTP POST request for adding a sport in the SportRepoController.
+        /// </summary>
+        /// <param name="collection">The form collection from the POST request.</param>
+        /// <returns>The action result after processing the add sport request.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult AddSport(IFormCollection collection)
         {
-            try
+            if (VM == null)
             {
-                return RedirectToAction(nameof(Index));
+                // Restore VM from session if it's null
+                var rep = HttpContext.Session.GetString("Repo") 
+                    ?? throw new NullReferenceException(nameof(HttpContext.Session));
+                ResetVMModel<SportRepo>(rep);
             }
-            catch
-            {
-                return View();
-            }
+
+            var json = TempData["key"] as string 
+                ?? throw new NullReferenceException(nameof(TempData));
+            var key = JsonUtils.Deserialize<Category>(json);
+
+            var name = collection["Name"];
+            var description = collection["Description"];
+            var sport = new Sport(name, description);
+
+            ValueAdd(key, sport);
+
+            var updated = SerializeVM();
+            HttpContext.Session.SetString("Repo", updated);
+
+            return RedirectToAction("Index");
         }
 
-        // GET: SportController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        #endregion
 
-        // POST: SportController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        #endregion
     }
 }

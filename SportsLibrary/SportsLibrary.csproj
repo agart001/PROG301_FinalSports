@@ -7,8 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Utilities\" />
-    <Folder Include="Statics\" />
+    <Compile Remove="Statics\**" />
+    <EmbeddedResource Remove="Statics\**" />
+    <None Remove="Statics\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="JSONs\currentRepo.json" />
+    <None Remove="JSONs\startupRepo.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="JSONs\currentRepo.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="JSONs\startupRepo.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

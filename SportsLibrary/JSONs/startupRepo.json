@@ -1,0 +1,121 @@
+{
+  "Contents": [
+    {
+      "Key": {
+        "ID": "29d9f628-4664-45df-8329-68d673fbb3cd",
+        "Name": "Combat",
+        "Description": "Combat Sports"
+      },
+      "Value": [
+        {
+          "Contents": [
+            {
+              "Key": {
+                "ID": "63ce0ff2-cc84-47d8-b170-53bd9ab95a1f",
+                "Name": "Professional",
+                "Description": "Pro MMA Fighters"
+              },
+              "Value": [
+                {
+                  "Wins": null,
+                  "Loses": null,
+                  "Contents": [],
+                  "ID": "7f2d1f6f-a925-495c-8770-6d64078b7a06",
+                  "Name": "FireHawks",
+                  "Description": null
+                },
+                {
+                  "Wins": null,
+                  "Loses": null,
+                  "Contents": [],
+                  "ID": "f6bf3c5e-759b-485a-a8a2-39f71c555e9a",
+                  "Name": "SnowPigeons",
+                  "Description": null
+                }
+              ]
+            }
+          ],
+          "ID": "07458af0-3eb7-4501-8871-62fe4b36df6e",
+          "Name": "MMA",
+          "Description": null
+        },
+        {
+          "Contents": [
+            {
+              "Key": {
+                "ID": "a535e6b4-c7d9-482b-9ca4-11f4acedf7e2",
+                "Name": "HighSchool",
+                "Description": "HS Wrestling"
+              },
+              "Value": [
+                {
+                  "Wins": null,
+                  "Loses": null,
+                  "Contents": [
+                    {
+                      "Key": {
+                        "ID": "05ed6bef-a1ca-4615-984b-b10bba9d2a63",
+                        "Name": "Team Staff",
+                        "Description": "The team's staff"
+                      },
+                      "Value": [
+                        {
+                          "Team": null,
+                          "FirstName": "Matt",
+                          "LastName": "King",
+                          "Age": 0,
+                          "Position": "",
+                          "ID": "f31f4cb1-d0ba-4074-b07d-6641a83e9fa1",
+                          "Name": "Matt King",
+                          "Description": null
+                        }
+                      ]
+                    },
+                    {
+                      "Key": {
+                        "ID": "3b492c9e-700d-4533-9fda-d83b78965d43",
+                        "Name": "Team Members",
+                        "Description": "The team's members"
+                      },
+                      "Value": [
+                        {
+                          "Team": null,
+                          "Stats": null,
+                          "FirstName": "Alex",
+                          "LastName": "Gartner",
+                          "Age": 0,
+                          "Position": "",
+                          "ID": "0b37c62c-a7d0-4b90-b80c-a92a1a881a26",
+                          "Name": "Alex Gartner",
+                          "Description": null
+                        }
+                      ]
+                    }
+                  ],
+                  "ID": "3eee852b-febb-48a7-8f09-62f4dbb94b2c",
+                  "Name": "LTHS",
+                  "Description": null
+                },
+                {
+                  "Wins": null,
+                  "Loses": null,
+                  "Contents": [],
+                  "ID": "da348af5-30f8-459f-b3e5-e1be293b2c9a",
+                  "Name": "HCHS",
+                  "Description": null
+                }
+              ]
+            }
+          ],
+          "ID": "6a522412-710d-4f08-a1a8-08b2f98b4e71",
+          "Name": "Wrestling",
+          "Description": null
+        }
+      ]
+    }
+  ],
+  "ID": "612b6099-0997-4f2c-b722-e00386e5a7b9",
+  "Name": "SportRepo",
+  "Description": null
+}
+
