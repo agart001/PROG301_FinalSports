@@ -5,122 +5,124 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-
-public class TestEntity : BaseEntity
+namespace SportsTests
 {
-    public TestEntity() : base() { }
-
-    public TestEntity(string? name) : base(name) { }
-
-    public TestEntity(string? name, string? description) : base(name, description) { }
-
-    public TestEntity(string? name, string? description, Guid id) : base(name, description, id) { }
-}
-
-[TestClass]
-public class BaseEntityTests
-{
-    [TestMethod]
-    public void DefaultConstructor_InitializedWithNewGuidAndEmptyName()
+    public class TestEntity : BaseEntity
     {
-        // Arrange
-        var entity = new TestEntity();
+        public TestEntity() : base() { }
 
-        // Act & Assert
-        Assert.IsNotNull(entity.ID);
-        Assert.AreEqual(string.Empty, entity.Name);
-        Assert.IsNull(entity.Description);
+        public TestEntity(string? name) : base(name) { }
+
+        public TestEntity(string? name, string? description) : base(name, description) { }
+
+        public TestEntity(string? name, string? description, Guid id) : base(name, description, id) { }
     }
 
-    [TestMethod]
-    public void ConstructorWithName_InitializedWithNewGuidAndProvidedName()
+    [TestClass]
+    public class BaseEntityTests
     {
-        // Arrange
-        string testName = "TestEntity";
-        var entity = new TestEntity(testName);
+        [TestMethod]
+        public void DefaultConstructor_InitializedWithNewGuidAndEmptyName()
+        {
+            // Arrange
+            var entity = new TestEntity();
 
-        // Act & Assert
-        Assert.IsNotNull(entity.ID);
-        Assert.AreEqual(testName, entity.Name);
-        Assert.IsNull(entity.Description);
-    }
+            // Act & Assert
+            Assert.IsNotNull(entity.ID);
+            Assert.AreEqual(string.Empty, entity.Name);
+            Assert.IsNull(entity.Description);
+        }
 
-    [TestMethod]
-    public void ConstructorWithNameAndDescription_InitializedWithNewGuidAndProvidedNameAndDescription()
-    {
-        // Arrange
-        string testName = "TestEntity";
-        string testDescription = "This is a test entity.";
-        var entity = new TestEntity(testName, testDescription);
+        [TestMethod]
+        public void ConstructorWithName_InitializedWithNewGuidAndProvidedName()
+        {
+            // Arrange
+            string testName = "TestEntity";
+            var entity = new TestEntity(testName);
 
-        // Act & Assert
-        Assert.IsNotNull(entity.ID);
-        Assert.AreEqual(testName, entity.Name);
-        Assert.AreEqual(testDescription, entity.Description);
-    }
+            // Act & Assert
+            Assert.IsNotNull(entity.ID);
+            Assert.AreEqual(testName, entity.Name);
+            Assert.IsNull(entity.Description);
+        }
 
-    [TestMethod]
-    public void ConstructorWithAllParameters_InitializedWithProvidedIdNameAndDescription()
-    {
-        // Arrange
-        Guid testId = Guid.NewGuid();
-        string testName = "TestEntity";
-        string testDescription = "This is a test entity.";
-        var entity = new TestEntity(testName, testDescription, testId);
+        [TestMethod]
+        public void ConstructorWithNameAndDescription_InitializedWithNewGuidAndProvidedNameAndDescription()
+        {
+            // Arrange
+            string testName = "TestEntity";
+            string testDescription = "This is a test entity.";
+            var entity = new TestEntity(testName, testDescription);
 
-        // Act & Assert
-        Assert.AreEqual(testId, entity.ID);
-        Assert.AreEqual(testName, entity.Name);
-        Assert.AreEqual(testDescription, entity.Description);
-    }
+            // Act & Assert
+            Assert.IsNotNull(entity.ID);
+            Assert.AreEqual(testName, entity.Name);
+            Assert.AreEqual(testDescription, entity.Description);
+        }
 
-    [TestMethod]
-    public void SetName_SetsEntityName()
-    {
-        // Arrange
-        var entity = new TestEntity();
+        [TestMethod]
+        public void ConstructorWithAllParameters_InitializedWithProvidedIdNameAndDescription()
+        {
+            // Arrange
+            Guid testId = Guid.NewGuid();
+            string testName = "TestEntity";
+            string testDescription = "This is a test entity.";
+            var entity = new TestEntity(testName, testDescription, testId);
 
-        // Act
-        entity.SetName("NewName");
+            // Act & Assert
+            Assert.AreEqual(testId, entity.ID);
+            Assert.AreEqual(testName, entity.Name);
+            Assert.AreEqual(testDescription, entity.Description);
+        }
 
-        // Assert
-        Assert.AreEqual("NewName", entity.Name);
-    }
+        [TestMethod]
+        public void SetName_SetsEntityName()
+        {
+            // Arrange
+            var entity = new TestEntity();
 
-    [TestMethod]
-    public void SetDescription_SetsEntityDescription()
-    {
-        // Arrange
-        var entity = new TestEntity();
+            // Act
+            entity.SetName("NewName");
 
-        // Act
-        entity.SetDescription("NewDescription");
+            // Assert
+            Assert.AreEqual("NewName", entity.Name);
+        }
 
-        // Assert
-        Assert.AreEqual("NewDescription", entity.Description);
-    }
+        [TestMethod]
+        public void SetDescription_SetsEntityDescription()
+        {
+            // Arrange
+            var entity = new TestEntity();
 
-    [TestMethod]
-    public void About_ReturnsDescription()
-    {
-        // Arrange
-        string testDescription = "This is a test entity.";
-        var entity = new TestEntity { Description = testDescription };
+            // Act
+            entity.SetDescription("NewDescription");
 
-        // Act
-        string result = entity.About();
+            // Assert
+            Assert.AreEqual("NewDescription", entity.Description);
+        }
 
-        // Assert
-        Assert.AreEqual(testDescription, result);
-    }
+        [TestMethod]
+        public void About_ReturnsDescription()
+        {
+            // Arrange
+            string testDescription = "This is a test entity.";
+            var entity = new TestEntity { Description = testDescription };
 
-    [TestMethod]
-    public void GetObjectData_ThrowsNotImplementedException()
-    {
-        // Arrange
-        var entity = new TestEntity();
+            // Act
+            string result = entity.About();
 
-        // Act & Assert
-        Assert.ThrowsException<NotImplementedException>(() => entity.GetObjectData(null!, new StreamingContext()));
+            // Assert
+            Assert.AreEqual(testDescription, result);
+        }
+
+        [TestMethod]
+        public void GetObjectData_ThrowsNotImplementedException()
+        {
+            // Arrange
+            var entity = new TestEntity();
+
+            // Act & Assert
+            Assert.ThrowsException<NotImplementedException>(() => entity.GetObjectData(null!, new StreamingContext()));
+        }
     }
 }

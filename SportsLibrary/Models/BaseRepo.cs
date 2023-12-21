@@ -58,7 +58,12 @@ namespace SportsLibrary.Models
         public ICollection<ICollection<TValue>>? GetValues()
         {
             if (Contents == null) throw new NullReferenceException(nameof(Contents));
-            return Contents.Select(kvp => kvp.Value).ToList();
+            List<ICollection<TValue>> values = new List<ICollection<TValue>>();
+            foreach (var kvp in Contents)
+            {
+                values.Add(kvp.Value);
+            }
+            return values;
         }
 
         #endregion
